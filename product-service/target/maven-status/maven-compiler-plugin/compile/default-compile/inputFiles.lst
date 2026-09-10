@@ -1,0 +1,15 @@
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\config\DataInitializer.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\controller\CategoryController.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\controller\ProductController.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\dto\CategoryDto.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\dto\ProductDto.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\dto\StockItem.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\dto\StockOperationRequest.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\dto\StockOperationResponse.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\entity\Category.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\entity\Product.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\ProductServiceApplication.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\repository\CategoryRepository.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\repository\ProductRepository.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\service\CategoryService.java
+D:\Spring+Microser+jwt Project\product-service\src\main\java\com\grocery\product\service\ProductService.java

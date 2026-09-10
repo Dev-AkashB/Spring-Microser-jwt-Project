@@ -1,0 +1,15 @@
+com\grocery\product\entity\Product.class
+com\grocery\product\dto\StockItem.class
+com\grocery\product\dto\StockOperationResponse.class
+com\grocery\product\repository\ProductRepository.class
+com\grocery\product\dto\CategoryDto.class
+com\grocery\product\dto\StockOperationRequest.class
+com\grocery\product\entity\Category.class
+com\grocery\product\service\ProductService.class
+com\grocery\product\controller\CategoryController.class
+com\grocery\product\dto\ProductDto.class
+com\grocery\product\repository\CategoryRepository.class
+com\grocery\product\controller\ProductController.class
+com\grocery\product\config\DataInitializer.class
+com\grocery\product\service\CategoryService.class
+com\grocery\product\ProductServiceApplication.class

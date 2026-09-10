@@ -1,0 +1,3 @@
+com\grocery\gateway\ApiGatewayApplication.class
+com\grocery\gateway\filter\AuthenticationFilter.class
+com\grocery\gateway\util\JwtUtil.class

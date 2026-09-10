@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshHarvest | Premium Online Grocery Supermarket</title>
+    <meta name="description" content="Shop fresh organic groceries, farm dairy, artisan bakery, and daily staples delivered right to your doorstep in minutes.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Top Announcement Bar -->
+    <div class="announcement-bar">
+        <div class="announcement-content">
+            <span>🌿 <strong>Flash Sale:</strong> Free express delivery on orders over $35!</span>
+            <span class="announcement-badge">⚡ Spring Boot 3 Microservices + JWT</span>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="navbar" id="mainNavbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="#" class="brand-logo" id="brandLogo">
+                    <div class="logo-icon">🥬</div>
+                    <div class="logo-text">
+                        <span class="brand-name">Fresh<span>Harvest</span></span>
+                        <span class="brand-tag">GROCERY MICROSERVICES</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search 1,000+ farm fresh vegetables, dairy, snacks..." autocomplete="off">
+                    <button class="clear-search-btn" id="clearSearchBtn" style="display: none;">✕</button>
+                </div>
+            </div>
+
+            <!-- Right Navigation Actions -->
+            <div class="nav-right">
+                <!-- Microservice Health Indicator -->
+                <button class="status-indicator-btn" id="serviceStatusBtn" title="Microservices Cluster Health">
+                    <span class="pulse-dot"></span>
+                    <span class="status-label">Cluster Live</span>
+                </button>
+
+                <!-- Admin Button (Hidden unless admin) -->
+                <a href="admin.html" class="nav-btn admin-badge-btn" id="adminPortalBtn" style="display: none; text-decoration: none;">
+                    ⚙️ Admin Portal
+                </a>
+
+                <!-- User Account / Auth Actions -->
+                <div class="auth-wrapper" id="authWrapper">
+                    <button class="nav-btn login-trigger-btn" id="loginBtn">
+                        <span class="user-avatar-icon">👤</span>
+                        <span>Sign In</span>
+                    </button>
+                    
+                    <div class="user-menu" id="userMenu" style="display: none;">
+                        <button class="user-pill-btn" id="userMenuBtn">
+                            <span class="user-avatar" id="navUserInitial">J</span>
+                            <span class="user-name" id="navUserName">John Doe</span>
+                            <span class="dropdown-arrow">▾</span>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <div class="dropdown-header">
+                                <p class="user-email-display" id="userEmailDisplay">john@example.com</p>
+                                <span class="role-badge" id="userRoleBadge">CUSTOMER</span>
+                            </div>
+                            <hr>
+                            <a href="#" class="dropdown-item" id="myOrdersLink">📦 My Orders</a>
+                            <a href="#" class="dropdown-item" id="deliveryAddressesLink">📍 Saved Addresses</a>
+                            <a href="admin.html" class="dropdown-item" id="adminSwitchLink" style="display: none;">🛠️ Admin Dashboard</a>
+                            <hr>
+                            <a href="#" class="dropdown-item text-danger" id="logoutBtn">🚪 Sign Out</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shopping Cart Button -->
+                <button class="cart-trigger-btn" id="cartTriggerBtn">
+                    <div class="cart-icon-wrap">
+                        🛒
+                        <span class="cart-badge" id="cartBadgeCount">0</span>
+                    </div>
+                    <div class="cart-text">
+                        <span class="cart-caption">My Basket</span>
+                        <span class="cart-price" id="cartHeaderTotal">$0.00</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Quick Demo Switcher Bar -->
+    <div class="demo-bar">
+        <div class="demo-bar-container">
+            <span class="demo-title">⚡ Quick 1-Click Test Credentials:</span>
+            <button class="demo-chip" id="demoCustomerBtn">👤 Customer (john@example.com)</button>
+            <button class="demo-chip admin-chip" id="demoAdminBtn">🛡️ Admin (admin@grocery.com)</button>
+            <span class="demo-hint">Tokens signed via JJWT HMAC-SHA256</span>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <span class="hero-pill">🌱 100% Certified Organic & Farm Fresh</span>
+                <h1 class="hero-title">Daily Groceries Delivered Fresh to Your Door</h1>
+                <p class="hero-subtitle">Experience lightning-fast grocery fulfillment powered by distributed Spring Boot microservices, Spring Cloud Gateway, and Netflix Eureka discovery.</p>
+                
+                <div class="hero-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">🚀</span>
+                        <span>15 Min Express Delivery</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🥦</span>
+                        <span>Direct from Local Farms</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔒</span>
+                        <span>Secure JWT Microservice API</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Filter Pills -->
+        <section class="categories-section">
+            <div class="section-header">
+                <h2>Browse by Category</h2>
+                <span class="category-count" id="categoryCountLabel">Loading categories...</span>
+            </div>
+            <div class="category-pills" id="categoryPills">
+                <button class="category-pill active" data-id="all">
+                    <span class="pill-icon">🌟</span>
+                    <span>All Groceries</span>
+                </button>
+                <!-- Dynamically loaded categories -->
+            </div>
+        </section>
+
+        <!-- Product Catalog Section -->
+        <section class="products-section">
+            <div class="catalog-header">
+                <div>
+                    <h2 id="currentCategoryTitle">Fresh Catalog</h2>
+                    <p class="catalog-subtitle" id="catalogSubtitle">Showing all farm-fresh and pantry staples</p>
+                </div>
+                <div class="catalog-controls">
+                    <select id="sortSelect" class="styled-select">
+                        <option value="default">Sort by: Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="name">Name: A to Z</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="product-grid" id="productGrid">
+                <!-- Dynamically populated product cards -->
+                <div class="grid-loading">
+                    <div class="spinner"></div>
+                    <p>Fetching fresh groceries from Catalog Service (Port 8082)...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Shopping Cart Drawer / Modal -->
+    <div class="drawer-overlay" id="cartOverlay">
+        <aside class="cart-drawer" id="cartDrawer">
+            <div class="drawer-header">
+                <div class="drawer-title-wrap">
+                    <h3>Your Grocery Basket</h3>
+                    <span class="item-count-badge" id="drawerItemCount">0 items</span>
+                </div>
+                <button class="close-drawer-btn" id="closeCartBtn">✕</button>
+            </div>
+
+            <!-- Free Delivery Progress Bar -->
+            <div class="delivery-progress-wrap">
+                <div class="progress-bar-label">
+                    <span id="freeDeliveryLabel">Add $35.00 for FREE delivery!</span>
+                    <span class="truck-icon">🚚</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="freeDeliveryProgress" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- Cart Items List -->
+            <div class="cart-items-container" id="cartItemsList">
+                <div class="empty-cart-state">
+                    <div class="empty-cart-icon">🛒</div>
+                    <p class="empty-title">Your basket is empty</p>
+                    <p class="empty-sub">Add farm-fresh produce and delicious snacks to get started!</p>
+                </div>
+            </div>
+
+            <!-- Cart Footer with Totals and Checkout -->
+            <div class="drawer-footer" id="cartFooter" style="display: none;">
+                <div class="bill-row">
+                    <span>Subtotal</span>
+                    <span id="cartSubtotal">$0.00</span>
+                </div>
+                <div class="bill-row">
+                    <span>Delivery Fee</span>
+                    <span id="cartDeliveryFee" class="text-success">Free</span>
+                </div>
+                <div class="bill-row">
+                    <span>Estimated Tax (5%)</span>
+                    <span id="cartTax">$0.00</span>
+                </div>
+                <div class="bill-divider"></div>
+                <div class="bill-row total-row">
+                    <span>Grand Total</span>
+                    <span id="cartGrandTotal">$0.00</span>
+                </div>
+
+                <button class="btn-checkout-primary" id="openCheckoutModalBtn">
+                    <span>Proceed to Checkout</span>
+                    <span class="btn-arrow">➔</span>
+                </button>
+                <button class="btn-clear-cart" id="clearCartActionBtn">Empty Basket</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Delivery & Payment</h3>
+                <button class="modal-close-btn" id="closeCheckoutBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="checkout-step">
+                    <label class="step-label">1. Delivery Address</label>
+                    <div class="address-selector" id="savedAddressSelector" style="display: none;">
+                        <label class="sub-label">Saved Addresses:</label>
+                        <select id="savedAddressSelect" class="styled-input"></select>
+                    </div>
+                    <textarea id="checkoutAddress" class="styled-textarea" placeholder="Enter street address, apartment, city, state, and postal code..." rows="3">742 Evergreen Terrace, Springfield, Oregon 97477</textarea>
+                </div>
+
+                <div class="checkout-step">
+                    <label class="step-label">2. Contact Phone Number</label>
+                    <input type="tel" id="checkoutPhone" class="styled-input" placeholder="+1 (555) 019-2834" value="+1-555-0143">
+                </div>
+
+                <div class="checkout-step">
+                    <label class="step-label">3. Select Payment Method</label>
+                    <div class="payment-methods-grid">
+                        <label class="payment-card selected">
+                            <input type="radio" name="paymentMethod" value="CASH_ON_DELIVERY" checked>
+                            <span class="payment-icon">💵</span>
+                            <span class="payment-name">Cash on Delivery</span>
+                        </label>
+                        <label class="payment-card">
+                            <input type="radio" name="paymentMethod" value="UPI">
+                            <span class="payment-icon">📱</span>
+                            <span class="payment-name">Instant UPI / QR</span>
+                        </label>
+                        <label class="payment-card">
+                            <input type="radio" name="paymentMethod" value="CREDIT_CARD">
+                            <span class="payment-icon">💳</span>
+                            <span class="payment-name">Card / NetBanking</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="order-summary-box">
+                    <div class="bill-row">
+                        <span>Items Total:</span>
+                        <strong id="modalSummaryTotal">$0.00</strong>
+                    </div>
+                    <p class="secure-checkout-notice">🔒 Inter-service stock verification via OpenFeign + JWT security enabled.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelCheckoutBtn">Back to Basket</button>
+                <button class="btn-confirm-order" id="submitOrderBtn">Place Grocery Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Success & Live Tracker Modal -->
+    <div class="modal-overlay" id="orderSuccessModal">
+        <div class="modal-card">
+            <div class="modal-header success-header">
+                <div class="success-icon-wrap">🎉</div>
+                <h3>Order Placed Successfully!</h3>
+                <button class="modal-close-btn" id="closeSuccessModalBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="order-receipt-card">
+                    <div class="receipt-row">
+                        <span>Order Number:</span>
+                        <strong id="successOrderNum">GROC-XXXXX</strong>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Delivery Tracking:</span>
+                        <strong id="successTrackingCode" class="text-primary">TRK-XXXXX</strong>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Status:</span>
+                        <span class="status-pill status-confirmed" id="successStatus">CONFIRMED</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Total Paid:</span>
+                        <strong id="successTotalAmount">$0.00</strong>
+                    </div>
+                </div>
+
+                <!-- Visual Order Lifecycle Tracker -->
+                <div class="order-tracker-timeline">
+                    <div class="tracker-step active" id="stepPlaced">
+                        <div class="circle">✓</div>
+                        <div class="step-text">Placed</div>
+                    </div>
+                    <div class="tracker-line active"></div>
+                    <div class="tracker-step active" id="stepConfirmed">
+                        <div class="circle">✓</div>
+                        <div class="step-text">Confirmed</div>
+                    </div>
+                    <div class="tracker-line" id="linePacking"></div>
+                    <div class="tracker-step" id="stepPacking">
+                        <div class="circle">📦</div>
+                        <div class="step-text">Packing</div>
+                    </div>
+                    <div class="tracker-line" id="lineDelivery"></div>
+                    <div class="tracker-step" id="stepDelivery">
+                        <div class="circle">🛵</div>
+                        <div class="step-text">On Delivery</div>
+                    </div>
+                    <div class="tracker-line" id="lineDelivered"></div>
+                    <div class="tracker-step" id="stepDelivered">
+                        <div class="circle">🏠</div>
+                        <div class="step-text">Delivered</div>
+                    </div>
+                </div>
+
+                <div class="delivery-time-callout">
+                    <span class="callout-icon">⏱️</span>
+                    <div>
+                        <strong>Estimated Arrival:</strong>
+                        <p id="successDeliveryEta">Within 15-30 minutes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="viewMyOrdersBtn">View My Orders</button>
+                <button class="btn-cancel" id="continueShoppingBtn">Continue Shopping</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Orders Modal -->
+    <div class="modal-overlay" id="myOrdersModal">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <h3>My Grocery Orders</h3>
+                <button class="modal-close-btn" id="closeOrdersModalBtn">✕</button>
+            </div>
+            <div class="modal-body" id="ordersListContainer">
+                <div class="loading-state">Loading your order history...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Portal Modal -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-card modal-xl">
+            <div class="modal-header admin-modal-header">
+                <div>
+                    <h3>⚙️ Store Admin & Microservices Orchestration</h3>
+                    <p class="admin-subtitle">Live catalog inventory, customer orders, and microservices status</p>
+                </div>
+                <button class="modal-close-btn" id="closeAdminModalBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <!-- Admin Tabs -->
+                <div class="admin-tabs">
+                    <button class="tab-btn active" data-tab="admin-inventory">📦 Product & Inventory Management</button>
+                    <button class="tab-btn" data-tab="admin-orders">📑 Customer Orders Management</button>
+                    <button class="tab-btn" data-tab="admin-cluster">🌐 Microservice Architecture Status</button>
+                </div>
+
+                <!-- Tab 1: Inventory -->
+                <div class="tab-content active" id="admin-inventory">
+                    <div class="admin-action-bar">
+                        <h4>Grocery Catalog</h4>
+                        <button class="btn-add-product" id="openAddProductFormBtn">+ Add New Grocery Item</button>
+                    </div>
+
+                    <!-- Add Product Form Drawer / Toggle -->
+                    <div class="add-product-form" id="addProductForm" style="display: none;">
+                        <h5>Add New Product to Catalog</h5>
+                        <form id="newProductForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Product Name *</label>
+                                    <input type="text" id="newProdName" required class="styled-input" placeholder="e.g. Organic Strawberries">
+                                </div>
+                                <div class="form-group">
+                                    <label>Category *</label>
+                                    <select id="newProdCategory" required class="styled-select"></select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Price ($) *</label>
+                                    <input type="number" step="0.01" id="newProdPrice" required class="styled-input" placeholder="3.99">
+                                </div>
+                                <div class="form-group">
+                                    <label>Discount Price ($)</label>
+                                    <input type="number" step="0.01" id="newProdDiscount" class="styled-input" placeholder="Optional sale price">
+                                </div>
+                                <div class="form-group">
+                                    <label>Unit / Pack *</label>
+                                    <input type="text" id="newProdUnit" required class="styled-input" placeholder="e.g. 500 g, 1 kg, 1 Liter">
+                                </div>
+                                <div class="form-group">
+                                    <label>Stock Quantity *</label>
+                                    <input type="number" id="newProdStock" required class="styled-input" placeholder="100">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Image URL</label>
+                                <input type="url" id="newProdImage" class="styled-input" placeholder="https://images.unsplash.com/...">
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="newProdDesc" rows="2" class="styled-textarea" placeholder="Delicious farm-fresh description..."></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">Save to Catalog</button>
+                                <button type="button" class="btn-cancel" id="cancelAddProductBtn">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="admin-table" id="adminProductsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Item</th>
+                                    <th>Category</th>
+                                    <th>Unit</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Orders -->
+                <div class="tab-content" id="admin-orders">
+                    <h4>Customer Orders Pipeline</h4>
+                    <div class="table-responsive">
+                        <table class="admin-table" id="adminOrdersTable">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                    <th>Update Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Microservices Cluster -->
+                <div class="tab-content" id="admin-cluster">
+                    <h4>Microservices Architecture & Ports</h4>
+                    <div class="cluster-grid">
+                        <div class="cluster-card" id="cardEureka">
+                            <div class="cluster-icon">📡</div>
+                            <div class="cluster-info">
+                                <h5>Eureka Discovery Server</h5>
+                                <span class="cluster-port">Port: 8761</span>
+                                <p>Dynamic Service Registry</p>
+                            </div>
+                            <span class="cluster-badge online">Active</span>
+                        </div>
+                        <div class="cluster-card" id="cardGateway">
+                            <div class="cluster-icon">🚪</div>
+                            <div class="cluster-info">
+                                <h5>API Gateway</h5>
+                                <span class="cluster-port">Port: 8080</span>
+                                <p>JWT Authentication Filter & Routing</p>
+                            </div>
+                            <span class="cluster-badge online">Active</span>
+                        </div>
+                        <div class="cluster-card" id="cardAuth">
+                            <div class="cluster-icon">🔐</div>
+                            <div class="cluster-info">
+                                <h5>Auth & User Service</h5>
+                                <span class="cluster-port">Port: 8081</span>
+                                <p>Spring Security 6, JJWT, H2</p>
+                            </div>
+                            <span class="cluster-badge online">Active</span>
+                        </div>
+                        <div class="cluster-card" id="cardProduct">
+                            <div class="cluster-icon">🍎</div>
+                            <div class="cluster-info">
+                                <h5>Product & Catalog Service</h5>
+                                <span class="cluster-port">Port: 8082</span>
+                                <p>Categories, Inventory Stock Control</p>
+                            </div>
+                            <span class="cluster-badge online">Active</span>
+                        </div>
+                        <div class="cluster-card" id="cardOrder">
+                            <div class="cluster-icon">🛒</div>
+                            <div class="cluster-info">
+                                <h5>Order & Cart Service</h5>
+                                <span class="cluster-port">Port: 8083</span>
+                                <p>OpenFeign Orchestration, Carts</p>
+                            </div>
+                            <span class="cluster-badge online">Active</span>
+                        </div>
+                        <div class="cluster-card" id="cardPayment">
+                            <div class="cluster-icon">💳</div>
+                            <div class="cluster-info">
+                                <h5>Payment & Delivery Service</h5>
+                                <span class="cluster-port">Port: 8084</span>
+                                <p>Transactions, Live Delivery Tracking</p>
+                            </div>
+                            <span class="cluster-badge online">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login / Registration Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-card auth-modal-card">
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" id="tabSignIn">Sign In</button>
+                <button class="auth-tab-btn" id="tabSignUp">Create Account</button>
+                <button class="modal-close-btn auth-close" id="closeAuthModalBtn">✕</button>
+            </div>
+
+            <!-- Sign In Form -->
+            <form id="signInForm" class="auth-form">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" required class="styled-input" placeholder="john@example.com" value="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required class="styled-input" placeholder="••••••••" value="customer123">
+                </div>
+                <button type="submit" class="btn-primary btn-block">Sign In</button>
+                <div class="quick-fill-hint">
+                    <span>Quick Fill:</span>
+                    <a href="#" id="fillCustomer">Customer</a> |
+                    <a href="#" id="fillAdmin">Admin</a>
+                </div>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="signUpForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regFullName" required class="styled-input" placeholder="Jane Smith">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" required class="styled-input" placeholder="jane@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" required class="styled-input" placeholder="At least 6 characters">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="regPhone" class="styled-input" placeholder="+1-555-0199">
+                </div>
+                <button type="submit" class="btn-primary btn-block">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-09-07T13:21:16.755+05:30  INFO 13104 --- [eureka-server] [           main] c.g.eureka.EurekaServerApplication       : Starting EurekaServerApplication v1.0.0 using Java 24.0.2 with PID 13104 (D:\Spring+Microser+jwt Project\eureka-server\target\eureka-server-1.0.0.jar started by akash in D:\Spring+Microser+jwt Project)
+2026-09-07T13:21:16.762+05:30  INFO 13104 --- [eureka-server] [           main] c.g.eureka.EurekaServerApplication       : No active profile set, falling back to 1 default profile: "default"
