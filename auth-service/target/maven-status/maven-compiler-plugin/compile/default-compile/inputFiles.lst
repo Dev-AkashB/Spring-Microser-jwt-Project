@@ -5,6 +5,7 @@ D:\Spring+Microser+jwt Project\auth-service\src\main\java\com\grocery\auth\dto\A
 D:\Spring+Microser+jwt Project\auth-service\src\main\java\com\grocery\auth\dto\AuthResponse.java
 D:\Spring+Microser+jwt Project\auth-service\src\main\java\com\grocery\auth\dto\LoginRequest.java
 D:\Spring+Microser+jwt Project\auth-service\src\main\java\com\grocery\auth\dto\RegisterRequest.java
+D:\Spring+Microser+jwt Project\auth-service\src\main\java\com\grocery\auth\dto\SsoLoginRequest.java
 D:\Spring+Microser+jwt Project\auth-service\src\main\java\com\grocery\auth\dto\UserProfileResponse.java
 D:\Spring+Microser+jwt Project\auth-service\src\main\java\com\grocery\auth\entity\Address.java
 D:\Spring+Microser+jwt Project\auth-service\src\main\java\com\grocery\auth\entity\Role.java

@@ -29,6 +29,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private static final List<String> OPEN_API_ENDPOINTS = List.of(
             "/api/auth/register",
             "/api/auth/login",
+            "/api/auth/sso",
             "/eureka"
     );
 

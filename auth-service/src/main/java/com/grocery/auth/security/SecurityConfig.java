@@ -37,6 +37,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/api/auth/register",
                     "/api/auth/login",
+                    "/api/auth/sso",
+                    "/api/auth/sso/**",
                     "/h2-console/**",
                     "/actuator/**"
                 ).permitAll()

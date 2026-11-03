@@ -38,6 +38,18 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/sso")
+    public ResponseEntity<?> ssoLogin(@RequestBody SsoLoginRequest request) {
+        try {
+            AuthResponse response = authService.loginWithSso(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "SSO Authentication failed: " + e.getMessage()));
+        }
+    }
+
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(Authentication authentication) {
         if (authentication == null) {

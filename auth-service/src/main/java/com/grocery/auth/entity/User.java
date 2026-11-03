@@ -37,6 +37,8 @@ public class User {
     @JsonManagedReference
     private List<Address> addresses = new ArrayList<>();
 
+    private String authProvider = "LOCAL";
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public User() {}
@@ -74,6 +76,9 @@ public class User {
 
     public List<Address> getAddresses() { return addresses; }
     public void setAddresses(List<Address> addresses) { this.addresses = addresses; }
+
+    public String getAuthProvider() { return authProvider; }
+    public void setAuthProvider(String authProvider) { this.authProvider = authProvider; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

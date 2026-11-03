@@ -83,6 +83,19 @@ const DOM = {
     fillCustomer: document.getElementById('fillCustomer'),
     fillAdmin: document.getElementById('fillAdmin'),
 
+    // SSO Elements
+    ssoGoogleBtn: document.getElementById('ssoGoogleBtn'),
+    ssoGithubBtn: document.getElementById('ssoGithubBtn'),
+    ssoQuickCustomerBtn: document.getElementById('ssoQuickCustomerBtn'),
+    demoSsoCustomerBtn: document.getElementById('demoSsoCustomerBtn'),
+    ssoModal: document.getElementById('ssoModal'),
+    closeSsoModalBtn: document.getElementById('closeSsoModalBtn'),
+    ssoAccount1: document.getElementById('ssoAccount1'),
+    ssoAccount2: document.getElementById('ssoAccount2'),
+    ssoCustomName: document.getElementById('ssoCustomName'),
+    ssoCustomEmail: document.getElementById('ssoCustomEmail'),
+    ssoCustomSubmitBtn: document.getElementById('ssoCustomSubmitBtn'),
+
     checkoutModal: document.getElementById('checkoutModal'),
     closeCheckoutBtn: document.getElementById('closeCheckoutBtn'),
     cancelCheckoutBtn: document.getElementById('cancelCheckoutBtn'),
@@ -114,6 +127,40 @@ const DOM = {
     newProductForm: document.getElementById('newProductForm'),
     newProdCategory: document.getElementById('newProdCategory'),
 
+    // Real-Time Top Bar & Live Clock
+    liveClockDisplay: document.getElementById('liveClockDisplay'),
+    deliverySlotDisplay: document.getElementById('deliverySlotDisplay'),
+    announcementMarquee: document.getElementById('announcementMarquee'),
+    locationPickerBtn: document.getElementById('locationPickerBtn'),
+    selectedAddressLabel: document.getElementById('selectedAddressLabel'),
+
+    // Live Search Suggestions Dropdown
+    searchContainer: document.getElementById('searchContainer'),
+    searchSuggestionsDropdown: document.getElementById('searchSuggestionsDropdown'),
+    suggestionsTitle: document.getElementById('suggestionsTitle'),
+    suggestionsCount: document.getElementById('suggestionsCount'),
+    suggestionsList: document.getElementById('suggestionsList'),
+
+    // Real-Time Nav Tracker
+    navOrderTrackerBtn: document.getElementById('navOrderTrackerBtn'),
+    navTrackerCount: document.getElementById('navTrackerCount'),
+
+    // Real-Time Subnav & Departments
+    subnavBar: document.getElementById('subnavBar'),
+    departmentsMenuBtn: document.getElementById('departmentsMenuBtn'),
+    departmentsFlyoutMenu: document.getElementById('departmentsFlyoutMenu'),
+    subnavLinks: document.getElementById('subnavLinks'),
+
+    // Real-Time Sitemap Footer
+    newsletterForm: document.getElementById('newsletterForm'),
+    newsletterEmail: document.getElementById('newsletterEmail'),
+    backToTopBtn: document.getElementById('backToTopBtn'),
+    sitemapTrackOrderLink: document.getElementById('sitemapTrackOrderLink'),
+    sitemapMyOrdersLink: document.getElementById('sitemapMyOrdersLink'),
+    sitemapOpenCartLink: document.getElementById('sitemapOpenCartLink'),
+    sitemapAddressesLink: document.getElementById('sitemapAddressesLink'),
+    sitemapAdminLink: document.getElementById('sitemapAdminLink'),
+
     toastContainer: document.getElementById('toastContainer')
 };
 
@@ -122,11 +169,17 @@ const DOM = {
 // ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
     initEventListeners();
+    initLiveClock();
+    initAnnouncementMarquee();
+    initLiveSearchSuggestions();
+    initSubnavAndDepartments();
+    initSitemapInteractivity();
     loadStoredAuth();
     await loadCategories();
     await loadProducts();
     if (state.user) {
         await fetchCart();
+        await loadMyOrdersCount();
     }
 });
 
@@ -185,6 +238,7 @@ async function loadCategories() {
         const data = await apiRequest('/api/categories');
         state.categories = Array.isArray(data) ? data : [];
         renderCategoryPills();
+        renderDepartmentsFlyout();
         populateAdminCategorySelect();
     } catch (e) {
         console.error('Failed to load categories', e);
@@ -215,6 +269,7 @@ async function loadProducts() {
         const data = await apiRequest(endpoint);
         state.products = Array.isArray(data) ? data : [];
         sortAndRenderProducts();
+        renderDepartmentsFlyout();
     } catch (e) {
         console.error('Failed to load products', e);
         DOM.productGrid.innerHTML = `
@@ -268,25 +323,14 @@ function renderCategoryPills() {
     DOM.categoryPills.querySelectorAll('.category-pill').forEach(btn => {
         btn.addEventListener('click', () => {
             const catId = btn.getAttribute('data-id');
-            state.activeCategoryId = catId;
-            renderCategoryPills();
-
-            if (catId === 'all') {
-                DOM.currentCategoryTitle.textContent = 'Fresh Catalog';
-                DOM.catalogSubtitle.textContent = 'Showing all farm-fresh produce and pantry staples';
-            } else {
-                const found = state.categories.find(c => String(c.id) === catId);
-                DOM.currentCategoryTitle.textContent = found ? found.name : 'Category Catalog';
-                DOM.catalogSubtitle.textContent = found ? (found.description || '') : '';
-            }
-
-            loadProducts();
+            filterCategoryById(catId);
         });
     });
 }
 
 function sortAndRenderProducts() {
     let list = [...state.products];
+    renderDepartmentsFlyout();
 
     if (state.sortBy === 'price-low') {
         list.sort((a, b) => (a.discountPrice || a.price) - (b.discountPrice || b.price));
@@ -431,11 +475,13 @@ function updateNavUser() {
 
         DOM.adminPortalBtn.style.display = isAdmin ? 'block' : 'none';
         DOM.adminSwitchLink.style.display = isAdmin ? 'block' : 'none';
+        loadMyOrdersCount();
     } else {
         DOM.loginBtn.style.display = 'flex';
         DOM.userMenu.style.display = 'none';
         DOM.adminPortalBtn.style.display = 'none';
         DOM.adminSwitchLink.style.display = 'none';
+        updateNavTrackerCount();
     }
 }
 
@@ -532,6 +578,42 @@ async function handleSignUp(fullName, email, password, phone) {
     }
 }
 
+async function handleSsoLogin(provider = 'GOOGLE', email = 'alex.morgan@gmail.com', fullName = 'Alex Morgan', phone = '+1-555-0199') {
+    try {
+        showToast(`Connecting to ${provider} Single Sign-On...`, 'info');
+        const res = await apiRequest('/api/auth/sso', {
+            method: 'POST',
+            body: JSON.stringify({
+                provider,
+                email,
+                fullName,
+                phone
+            })
+        });
+
+        state.user = res;
+        localStorage.setItem('freshharvest_user', JSON.stringify(res));
+        updateNavUser();
+        if (DOM.authModal) closeModal(DOM.authModal);
+        if (DOM.ssoModal) closeModal(DOM.ssoModal);
+        showToast(`Signed in via ${provider} SSO! Welcome, ${res.fullName || res.email}!`, 'success');
+
+        await fetchCart();
+        sortAndRenderProducts();
+    } catch (e) {
+        showToast(`SSO Sign In failed: ${e.message}`, 'error');
+    }
+}
+
+function openSsoModal(provider = 'GOOGLE') {
+    if (DOM.authModal) closeModal(DOM.authModal);
+    const titleEl = document.getElementById('ssoModalTitle');
+    if (titleEl) {
+        titleEl.textContent = provider === 'GITHUB' ? 'Sign in with GitHub SSO' : 'Sign in with Google SSO';
+    }
+    openModal(DOM.ssoModal);
+}
+
 function logout() {
     state.user = null;
     localStorage.removeItem('freshharvest_user');
@@ -579,6 +661,7 @@ async function submitOrder() {
         closeCartDrawer();
         await fetchCart();
         sortAndRenderProducts();
+        await loadMyOrdersCount();
 
         // Show Success & Live Tracker Modal
         DOM.successOrderNum.textContent = res.orderNumber || `GROC-${res.id}`;
@@ -605,6 +688,7 @@ async function loadMyOrders() {
     try {
         const orders = await apiRequest('/api/orders/user');
         state.orders = Array.isArray(orders) ? orders : [];
+        updateNavTrackerCount();
 
         if (state.orders.length === 0) {
             DOM.ordersListContainer.innerHTML = `
@@ -865,6 +949,36 @@ function initEventListeners() {
     // Demo Accounts Quick Switches
     DOM.demoCustomerBtn.addEventListener('click', () => handleSignIn('john@example.com', 'customer123'));
     DOM.demoAdminBtn.addEventListener('click', () => handleSignIn('admin@grocery.com', 'admin123'));
+    if (DOM.demoSsoCustomerBtn) {
+        DOM.demoSsoCustomerBtn.addEventListener('click', () => handleSsoLogin('GOOGLE', 'alex.morgan@gmail.com', 'Alex Morgan', '+1-555-0199'));
+    }
+
+    // SSO Handlers
+    if (DOM.ssoGoogleBtn) {
+        DOM.ssoGoogleBtn.addEventListener('click', () => openSsoModal('GOOGLE'));
+    }
+    if (DOM.ssoGithubBtn) {
+        DOM.ssoGithubBtn.addEventListener('click', () => handleSsoLogin('GITHUB', 'alex.dev@github.com', 'Alex Dev', '+1-555-0188'));
+    }
+    if (DOM.ssoQuickCustomerBtn) {
+        DOM.ssoQuickCustomerBtn.addEventListener('click', () => handleSsoLogin('GOOGLE', 'alex.morgan@gmail.com', 'Alex Morgan', '+1-555-0199'));
+    }
+    if (DOM.closeSsoModalBtn) {
+        DOM.closeSsoModalBtn.addEventListener('click', () => closeModal(DOM.ssoModal));
+    }
+    if (DOM.ssoAccount1) {
+        DOM.ssoAccount1.addEventListener('click', () => handleSsoLogin('GOOGLE', 'alex.morgan@gmail.com', 'Alex Morgan', '+1-555-0199'));
+    }
+    if (DOM.ssoAccount2) {
+        DOM.ssoAccount2.addEventListener('click', () => handleSsoLogin('GOOGLE', 'sarah.connor@gmail.com', 'Sarah Connor', '+1-555-0155'));
+    }
+    if (DOM.ssoCustomSubmitBtn) {
+        DOM.ssoCustomSubmitBtn.addEventListener('click', () => {
+            const email = (DOM.ssoCustomEmail && DOM.ssoCustomEmail.value.trim()) || 'custom.customer@gmail.com';
+            const name = (DOM.ssoCustomName && DOM.ssoCustomName.value.trim()) || 'SSO Customer';
+            handleSsoLogin('GOOGLE', email, name);
+        });
+    }
 
     DOM.fillCustomer.addEventListener('click', (e) => {
         e.preventDefault();
@@ -1046,5 +1160,434 @@ function formatDate(dateStr) {
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     } catch (e) {
         return dateStr;
+    }
+}
+
+// ==========================================
+// Real-Time Top Bar, Live Clock & Marquee
+// ==========================================
+function initLiveClock() {
+    function updateClock() {
+        const now = new Date();
+        if (DOM.liveClockDisplay) {
+            DOM.liveClockDisplay.textContent = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+        if (DOM.deliverySlotDisplay) {
+            // Compute dynamic delivery window 20-45 mins from now
+            const start = new Date(now.getTime() + 20 * 60000);
+            const end = new Date(now.getTime() + 45 * 60000);
+            const fmt = (d) => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            DOM.deliverySlotDisplay.textContent = `Next Slot: ${fmt(start)} – ${fmt(end)}`;
+        }
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
+function initAnnouncementMarquee() {
+    const items = document.querySelectorAll('.announcement-marquee .marquee-item');
+    if (!items || items.length <= 1) return;
+    let idx = 0;
+    setInterval(() => {
+        items[idx].classList.remove('active');
+        idx = (idx + 1) % items.length;
+        items[idx].classList.add('active');
+    }, 4500);
+}
+
+// ==========================================
+// Real-Time Live Search Suggestions
+// ==========================================
+function initLiveSearchSuggestions() {
+    if (!DOM.searchInput || !DOM.searchSuggestionsDropdown) return;
+
+    function renderSuggestions(query) {
+        const q = (query || '').toLowerCase().trim();
+        if (!q) {
+            DOM.searchSuggestionsDropdown.style.display = 'none';
+            return;
+        }
+
+        const matches = state.products.filter(p => 
+            p.name.toLowerCase().includes(q) || 
+            (p.categoryName && p.categoryName.toLowerCase().includes(q)) ||
+            (p.description && p.description.toLowerCase().includes(q))
+        ).slice(0, 5);
+
+        DOM.suggestionsCount.textContent = `${matches.length} found`;
+        DOM.suggestionsTitle.textContent = `Matching "${q}"`;
+
+        if (matches.length === 0) {
+            DOM.suggestionsList.innerHTML = `
+                <div style="padding: 14px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                    No groceries matching "${escapeHtml(q)}". Try "Organic", "Milk", or "Bread".
+                </div>
+            `;
+        } else {
+            DOM.suggestionsList.innerHTML = matches.map(p => {
+                const effPrice = (p.discountPrice && p.discountPrice < p.price) ? p.discountPrice : p.price;
+                return `
+                    <div class="suggestion-item" data-id="${p.id}">
+                        <img class="suggestion-thumb" src="${escapeHtml(p.imageUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=500')}" alt="${escapeHtml(p.name)}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=500';">
+                        <div class="suggestion-info">
+                            <div class="suggestion-name">${escapeHtml(p.name)}</div>
+                            <div class="suggestion-meta">
+                                <span>${escapeHtml(p.categoryName || 'Grocery')}</span>
+                                <span>•</span>
+                                <span>${escapeHtml(p.unit || '1 unit')}</span>
+                            </div>
+                        </div>
+                        <div class="suggestion-price">$${Number(effPrice).toFixed(2)}</div>
+                        <button type="button" class="suggestion-add-btn" onclick="event.stopPropagation(); handleAddToCart(${p.id})">+ Add</button>
+                    </div>
+                `;
+            }).join('');
+
+            DOM.suggestionsList.querySelectorAll('.suggestion-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const prodId = item.getAttribute('data-id');
+                    DOM.searchSuggestionsDropdown.style.display = 'none';
+                    const targetCard = document.querySelector(`.product-card[data-id="${prodId}"]`);
+                    if (targetCard) {
+                        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetCard.style.boxShadow = '0 0 0 3px var(--primary)';
+                        setTimeout(() => targetCard.style.boxShadow = '', 2000);
+                    }
+                });
+            });
+        }
+
+        DOM.searchSuggestionsDropdown.style.display = 'block';
+    }
+
+    DOM.searchInput.addEventListener('input', (e) => {
+        renderSuggestions(e.target.value);
+    });
+
+    DOM.searchInput.addEventListener('focus', () => {
+        if (DOM.searchInput.value.trim()) {
+            renderSuggestions(DOM.searchInput.value);
+        }
+    });
+
+    // Popular tag chips
+    document.querySelectorAll('.search-tag-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const query = chip.getAttribute('data-query');
+            DOM.searchInput.value = query;
+            state.searchQuery = query;
+            DOM.clearSearchBtn.style.display = 'block';
+            loadProducts();
+            DOM.searchSuggestionsDropdown.style.display = 'none';
+            document.getElementById('productsSection')?.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // Close suggestions on outside click
+    document.addEventListener('click', (e) => {
+        if (DOM.searchContainer && !DOM.searchContainer.contains(e.target)) {
+            DOM.searchSuggestionsDropdown.style.display = 'none';
+        }
+    });
+
+    // Global shortcut: press '/' to focus search
+    document.addEventListener('keydown', (e) => {
+        if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            DOM.searchInput.focus();
+            DOM.searchInput.select();
+        } else if (e.key === 'Escape' && DOM.searchSuggestionsDropdown) {
+            DOM.searchSuggestionsDropdown.style.display = 'none';
+        }
+    });
+}
+
+// ==========================================
+// Real-Time Subnav & Department Menu
+// ==========================================
+function initSubnavAndDepartments() {
+    if (DOM.departmentsMenuBtn && DOM.departmentsFlyoutMenu) {
+        DOM.departmentsMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            DOM.departmentsFlyoutMenu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', () => {
+            DOM.departmentsFlyoutMenu.classList.remove('show');
+        });
+    }
+
+    // Subnav category links
+    document.querySelectorAll('.subnav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const cat = link.getAttribute('data-category');
+            document.querySelectorAll('.subnav-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+
+            if (cat === 'all') {
+                filterCategoryById('all');
+            } else if (cat === 'specials') {
+                state.activeCategoryId = 'all';
+                state.sortBy = 'price-low';
+                DOM.sortSelect.value = 'price-low';
+                DOM.currentCategoryTitle.textContent = '🔥 Weekly Flash Specials';
+                DOM.catalogSubtitle.textContent = 'Discounted farm-fresh produce and grocery bundles';
+                renderCategoryPills();
+                loadProducts();
+            } else {
+                const found = state.categories.find(c => 
+                    c.name.toLowerCase() === cat.toLowerCase() || 
+                    c.name.toLowerCase().includes(cat.toLowerCase()) || 
+                    cat.toLowerCase().includes(c.name.toLowerCase())
+                );
+                if (found) {
+                    filterCategoryById(String(found.id));
+                } else {
+                    filterCategoryById('all');
+                }
+            }
+
+            document.getElementById('productsSection')?.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+}
+
+function renderDepartmentsFlyout() {
+    if (!DOM.departmentsFlyoutMenu) return;
+    let html = `
+        <a class="flyout-cat-item" data-id="all">
+            <span class="flyout-cat-left">
+                <span>🌟</span>
+                <span class="flyout-cat-name">All Departments</span>
+            </span>
+            <span class="flyout-cat-count">${state.products.length} items</span>
+        </a>
+    `;
+
+    state.categories.forEach(cat => {
+        const prodCount = state.products.filter(p => p.categoryId === cat.id).length;
+        html += `
+            <a class="flyout-cat-item" data-id="${cat.id}">
+                <span class="flyout-cat-left">
+                    <span>${cat.icon || '🥦'}</span>
+                    <span class="flyout-cat-name">${escapeHtml(cat.name)}</span>
+                </span>
+                <span class="flyout-cat-count">${prodCount} items</span>
+            </a>
+        `;
+    });
+
+    DOM.departmentsFlyoutMenu.innerHTML = html;
+
+    DOM.departmentsFlyoutMenu.querySelectorAll('.flyout-cat-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const id = item.getAttribute('data-id');
+            filterCategoryById(id);
+            DOM.departmentsFlyoutMenu.classList.remove('show');
+            document.getElementById('productsSection')?.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+}
+
+function filterCategoryById(catId) {
+    state.activeCategoryId = String(catId);
+    renderCategoryPills();
+
+    if (catId === 'all') {
+        DOM.currentCategoryTitle.textContent = 'Fresh Catalog';
+        DOM.catalogSubtitle.textContent = 'Showing all farm-fresh produce and pantry staples';
+    } else {
+        const found = state.categories.find(c => String(c.id) === String(catId));
+        DOM.currentCategoryTitle.textContent = found ? found.name : 'Category Catalog';
+        DOM.catalogSubtitle.textContent = found ? (found.description || '') : '';
+    }
+
+    // Sync subnav active state
+    document.querySelectorAll('.subnav-link').forEach(l => {
+        const cat = l.getAttribute('data-category');
+        if (catId === 'all' && cat === 'all') {
+            l.classList.add('active');
+        } else if (catId !== 'all') {
+            const found = state.categories.find(c => String(c.id) === String(catId));
+            if (found && (found.name.toLowerCase().includes(cat.toLowerCase()) || cat.toLowerCase().includes(found.name.toLowerCase()))) {
+                l.classList.add('active');
+            } else {
+                l.classList.remove('active');
+            }
+        } else {
+            l.classList.remove('active');
+        }
+    });
+
+    loadProducts();
+}
+
+// ==========================================
+// Real-Time Orders Tracker & Counter
+// ==========================================
+async function loadMyOrdersCount() {
+    if (!state.user) return;
+    try {
+        const orders = await apiRequest('/api/orders/user');
+        state.orders = Array.isArray(orders) ? orders : [];
+        updateNavTrackerCount();
+    } catch (e) {
+        // silent fail
+    }
+}
+
+function updateNavTrackerCount() {
+    if (!DOM.navTrackerCount) return;
+    if (!state.user) {
+        DOM.navTrackerCount.textContent = '0 Active';
+        DOM.navTrackerCount.style.color = 'var(--text-muted)';
+        return;
+    }
+    const activeOrders = state.orders.filter(o => o.status === 'CONFIRMED' || o.status === 'PENDING' || o.status === 'PROCESSING');
+    if (activeOrders.length > 0) {
+        DOM.navTrackerCount.textContent = `${activeOrders.length} Active • En Route`;
+        DOM.navTrackerCount.style.color = 'var(--primary-dark)';
+    } else if (state.orders.length > 0) {
+        DOM.navTrackerCount.textContent = `${state.orders.length} Past Orders`;
+        DOM.navTrackerCount.style.color = 'var(--text-muted)';
+    } else {
+        DOM.navTrackerCount.textContent = '0 Active';
+        DOM.navTrackerCount.style.color = 'var(--text-muted)';
+    }
+}
+
+// ==========================================
+// Real-Time Sitemap & Footer Interactivity
+// ==========================================
+function initSitemapInteractivity() {
+    // Sitemap category navigation links
+    document.querySelectorAll('.sitemap-nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const cat = link.getAttribute('data-cat');
+            if (cat === 'all') {
+                filterCategoryById('all');
+            } else {
+                const found = state.categories.find(c => 
+                    c.name.toLowerCase() === cat.toLowerCase() || 
+                    c.name.toLowerCase().includes(cat.toLowerCase()) ||
+                    cat.toLowerCase().includes(c.name.toLowerCase())
+                );
+                if (found) {
+                    filterCategoryById(String(found.id));
+                } else {
+                    filterCategoryById('all');
+                }
+            }
+            document.getElementById('productsSection')?.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // Sitemap Order & Account Links
+    if (DOM.sitemapTrackOrderLink) {
+        DOM.sitemapTrackOrderLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!state.user) {
+                openAuthModal('signin');
+            } else {
+                loadMyOrders();
+            }
+        });
+    }
+
+    if (DOM.sitemapMyOrdersLink) {
+        DOM.sitemapMyOrdersLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!state.user) {
+                openAuthModal('signin');
+            } else {
+                loadMyOrders();
+            }
+        });
+    }
+
+    if (DOM.sitemapOpenCartLink) {
+        DOM.sitemapOpenCartLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openCartDrawer();
+        });
+    }
+
+    if (DOM.sitemapAddressesLink) {
+        DOM.sitemapAddressesLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const currentAddr = (state.user && state.user.address) || 'Downtown, 5th Ave';
+            showToast(`📍 Default Delivery Address: ${currentAddr}. You can change this anytime during checkout.`, 'info');
+        });
+    }
+
+    // Policy informational toasts
+    document.querySelectorAll('.sitemap-info-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const infoType = link.getAttribute('data-info');
+            if (infoType === 'delivery') {
+                showToast('🚀 Express Dispatch: Hyperlocal delivery across 15-mile radius within 15-30 minutes.', 'info');
+            } else if (infoType === 'refund') {
+                showToast('🔄 100% Quality Guarantee: Any produce issues are refunded immediately with zero hassle.', 'success');
+            } else if (infoType === 'organic') {
+                showToast('🌱 Organic Standard: Direct farm-gate contracts with certified non-GMO, organic growers.', 'success');
+            } else if (infoType === 'help') {
+                showToast('❓ 24/7 Support Hotline: 1-800-FRESH-GROCERY or email support@freshharvest.com', 'info');
+            } else if (infoType === 'privacy') {
+                showToast('🔒 Privacy: Your data is protected by Spring Cloud Gateway and JJWT tokens.', 'info');
+            } else if (infoType === 'terms') {
+                showToast('📜 FreshHarvest terms of service active. Microservices cluster rate-limiting enabled.', 'info');
+            }
+        });
+    });
+
+    // Newsletter Form
+    if (DOM.newsletterForm) {
+        DOM.newsletterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = DOM.newsletterEmail ? DOM.newsletterEmail.value.trim() : '';
+            if (email) {
+                showToast(`🎉 Success! Welcome to FreshHarvest Insider. Use code FRESH10 for $10 OFF!`, 'success');
+                DOM.newsletterForm.reset();
+            }
+        });
+    }
+
+    // Back to top button
+    if (DOM.backToTopBtn) {
+        DOM.backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // Location Picker button in nav
+    if (DOM.locationPickerBtn) {
+        const locations = ['Downtown, 5th Ave', 'Westside, Elm St', 'Midtown, Park Ave', 'North Bay, Marina', 'Uptown, Broadway'];
+        let locIndex = 0;
+        DOM.locationPickerBtn.addEventListener('click', () => {
+            locIndex = (locIndex + 1) % locations.length;
+            const newLoc = locations[locIndex];
+            if (DOM.selectedAddressLabel) {
+                DOM.selectedAddressLabel.textContent = `${newLoc} ▾`;
+            }
+            showToast(`📍 Delivery location updated to: ${newLoc}`, 'info');
+        });
+    }
+
+    // Navbar Order Tracker Button
+    if (DOM.navOrderTrackerBtn) {
+        DOM.navOrderTrackerBtn.addEventListener('click', () => {
+            if (!state.user) {
+                openAuthModal('signin');
+            } else {
+                loadMyOrders();
+            }
+        });
     }
 }
